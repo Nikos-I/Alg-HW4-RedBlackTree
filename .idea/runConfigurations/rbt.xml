@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="rbt" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="RBTree.Main" />
+    <module name="RedBlackTree" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
