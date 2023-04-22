@@ -1,3 +1,6 @@
+
+//https://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE-%D1%87%D1%91%D1%80%D0%BD%D0%BE%D0%B5_%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BE
+
 package RBTree;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,23 +26,44 @@ public class RBTree {
         return null;
     }
 
+//    Новый узел в красно-чёрное дерево добавляется на место одного из листьев, окрашивается в красный цвет и
+//    к нему прикрепляется два листа (так как листья являются абстракцией, не содержащей данных, их добавление
+//    не требует дополнительной операции).
+//    Что происходит дальше, зависит от цвета близлежащих узлов. Заметим, что:
+//
+//    Свойство 3 (Все листья чёрные) выполняется всегда.
+//    Свойство 4 (Оба потомка любого красного узла — чёрные) может нарушиться только при добавлении красного узла,
+//    при перекрашивании чёрного узла в красный или при повороте.
+//    Свойство 5 (Все пути от любого узла до листовых узлов содержат одинаковое число чёрных узлов)
+//    может нарушиться только при добавлении чёрного узла, перекрашивании красного узла в чёрный (или наоборот),
+//    или при повороте.
+//    Примечание: Буквой N будем обозначать текущий узел (окрашенный красным).
+//    Сначала это новый узел, который вставляется, но эта процедура может применяться рекурсивно к другим узлам
+//    (смотрите случай 3).
+//    P будем обозначать предка N, через G обозначим дедушку N,
+//    а U будем обозначать дядю (узел, имеющий общего родителя с узлом P).
+//    Отметим, что в некоторых случаях роли узлов могут меняться, но, в любом случае, каждое обозначение будет
+//    представлять тот же узел, что и в начале.
+
+
     // Вставка ноды с ключом key
     public void insert(int key) {
         RBTreeNode node = new RBTreeNode(key);
         if (root == null) {
+            // Вставка первой ноды
             root = node;
             node.setColor(BLACK);
             return;
         }
-        RBTreeNode parent = root;
-        RBTreeNode son = null;
-        if (key <= parent.getKey()) {
-            son = parent.getLeft();
+        RBTreeNode parent = root;   // Родитель
+        RBTreeNode son = null;      // Потомок
+        if (key <= parent.getKey()) {   // Если ключ родителя меньше или равен ключу вставляемого
+            son = parent.getLeft(); // Получить левого потомока родителя
         } else {
-            son = parent.getRight();
+            son = parent.getRight();    // Получить правого потомока родителя
         }
-        //find the position
-        while (son != null) {
+        // Поиск позиции для вставки ноды
+        while (son != null) {       // Найти последнего потомока (лист) в дереве
             parent = son;
             if (key <= parent.getKey()) {
                 son = parent.getLeft();
@@ -47,24 +71,25 @@ public class RBTree {
                 son = parent.getRight();
             }
         }
-        if (key <= parent.getKey()) {
+        if (key <= parent.getKey()) { // Добавить ноду в конец дерева (присоединить к листу)
             parent.setLeft(node);
         } else {
             parent.setRight(node);
         }
         node.setParent(parent);
 
-        //fix up
+        // Сохранить ноду в дереве
         insertFix(node);
     }
 
-    // Вставка готовой ноды
+    // Вставка подготовленной ноды
     private void insertFix(@NotNull RBTreeNode node) {
         RBTreeNode father, grandFather;
-        while ((father = node.getParent()) != null && father.getColor() == RED) {
+        while ((father = node.getParent()) != null && father.getColor() == RED) { // Пока предок - красный
             grandFather = father.getParent();
             if (grandFather.getLeft() == father) {  // F - ситуация с левым сыном G, как и в предыдущем анализе
-                RBTreeNode uncle = grandFather.getRight();
+                RBTreeNode uncle = grandFather.getRight(); // получить дядю (соседа) предка
+                // Установить цвета нод. При необходимости, повернуть
                 if (uncle != null && uncle.getColor() == RED) {
                     setBlack(father);
                     setBlack(uncle);
@@ -103,6 +128,7 @@ public class RBTree {
         }
         setBlack(root);
     }
+
 
     // Удаление ноды с ключом key
     public void delete(int key) {
